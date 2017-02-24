@@ -30,6 +30,9 @@ var conversation = new Conversation({
 });
 // End Watson Conversation
 
+// JTE TODO - make this thread-safe and store in in-memory cache
+var conversationContext = {};
+
 var app = express();
 
 // JTE NEEDED?
@@ -62,7 +65,6 @@ app.post('/sms', function(req, res) {
   // FORM-URLENCODED as per Twilio POST format
   var inFrom = req.body.From;
   var inBody = req.body.Body;
-  var inContext = req.body.Context;
   console.log('Input received: ' + inBody + ' from ' + inFrom );
 
 
@@ -80,7 +82,7 @@ app.post('/sms', function(req, res) {
   // Send the input to the conversation service
   conversation.message({
       input: { text: inBody },
-      context : inContext,
+      context : conversationContext,
       workspace_id: conversationWorkspace
     }, function(err, data) {
       var responseMsg;
@@ -91,6 +93,12 @@ app.post('/sms', function(req, res) {
         // Extract response
         var resptext = data.output.text[0];
         console.log(resptext);
+
+        // Store updated context
+        // JTE TODO - make this thread-safe
+        conversationContext = req.body.Context;
+        console.log(conversationContext);
+
         responseMsg = resptext;
       }
 
