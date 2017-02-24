@@ -10,7 +10,8 @@
     "cfenv": "1.0.x",
     "express": "^4.13.4",
     "http": "0.0.0",
-    "twilio": "^2.11.1"
+    "twilio": "^2.11.1",
+    "watson-developer-cloud": "^2.21.1"
   },
   "repository": {},
   "engines": {
