@@ -5,7 +5,7 @@ var bodyParser = require('body-parser');
 
 //require the Twilio module and create a REST client
 var twilio = require('twilio');
-var client = require('./twilio-node/lib')('ACbb28e740dadc52c2575f545b1d544b83', 'd31a27296b3b9ea2f0893cc64411198b');
+//var client = require('./twilio-node/lib')('ACbb28e740dadc52c2575f545b1d544b83', 'd31a27296b3b9ea2f0893cc64411198b');
 
 // cfenv provides access to your Cloud Foundry environment
 // for more info, see: https://www.npmjs.com/package/cfenv
