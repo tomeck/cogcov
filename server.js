@@ -27,7 +27,6 @@ var conversation = new Conversation({
   username: conversationUsername,
   password: conversationPassword,
   version_date: Conversation.VERSION_DATE_2017_02_03
-  //url: 'https://gateway.watsonplatform.net/conversation/api'
 });
 // End Watson Conversation
 
@@ -90,7 +89,7 @@ app.post('/sms', function(req, res) {
         // Extract response
         var resptext = data.output.text[0];
         console.log(resptext);
-        responseMsg = JSON.stringify({'response':resptext});
+        responseMsg = resptext;
       }
 
       // Compose the response to Twilio that will be SMS'd back to originator
