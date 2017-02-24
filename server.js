@@ -62,6 +62,7 @@ app.post('/sms', function(req, res) {
   // FORM-URLENCODED as per Twilio POST format
   var inFrom = req.body.From;
   var inBody = req.body.Body;
+  var inContext = req.body.Context;
   console.log('Input received: ' + inBody + ' from ' + inFrom );
 
 
@@ -79,6 +80,7 @@ app.post('/sms', function(req, res) {
   // Send the input to the conversation service
   conversation.message({
       input: { text: inBody },
+      context : inContext,
       workspace_id: conversationWorkspace
     }, function(err, data) {
       var responseMsg;
