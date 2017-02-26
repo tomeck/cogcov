@@ -28,9 +28,10 @@ You need some development tools installed on your local machine (e.g. Macbook, W
 ## Get the code
 
 Now get a copy of the source code for this application and build it by entering the following commands in your Terminal window:
+
 1. `git clone https://github.com/tomeck/cogcov.git`
-+ `cd cogcov`
-+ `npm install`
++  `cd cogcov`
++  `npm install`
 
 ## Run the app locally
 

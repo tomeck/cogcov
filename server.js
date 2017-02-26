@@ -22,7 +22,7 @@ var appEnv = cfenv.getAppEnv();
 //var conversationPassword = vcap_services.conversation.credentials.password || 'qGz4gBDXiHHi';
 var conversationUsername = 'e7628040-92ad-4a01-8415-467b78ee3110';
 var conversationPassword = 'qGz4gBDXiHHi';
-var conversationWorkspace = 'ba1d1b65-2ce5-4901-8377-2de214dea244';
+var conversationWorkspace = 'd0b8c93b-f4f2-4689-b980-3cedfb519d0d'// 'ba1d1b65-2ce5-4901-8377-2de214dea244';
 
 // Create the service wrapper
 var conversation = new Conversation({
@@ -85,15 +85,30 @@ app.post('/sms', function(req, res) {
         console.error('Something bad happened: ' + JSON.stringify(err, null, 2));
         responseMsg = JSON.stringify(err, null, 2)
       } else {
-        // Extract response
+
+        // Extract response returned by Watson
         var resptext = data.output.text[0];
-        console.log(resptext);
+
+        var firstIntent = (data.intents != null && data.intents.length>0 ) ? data.intents[0] : null;
+        var intentName = (firstIntent != null) ? firstIntent.intent : "";
+        var intentConfidence = (firstIntent != null) ? firstIntent.confidence : "";
+
+        var firstEntity = (data.entities != null && data.entities.length>0 ) ? data.entities[0] : null;
+        var entityName = (firstEntity != null) ? firstEntity.entity : "";
+        var entityValue= (firstEntity != null) ? firstEntity.value : "";
+
+        var conversationId = data.context.conversation_id;
+        console.log('Detected intent {' + intentName + '} with confidence ' + intentConfidence);
+        console.log('Detected entity {' + entityName + '} with value {' + entityValue) + "}";
+        console.log('Conversation id = ' + conversationId);
+        console.log('Response will be: ' + resptext);
 
         // Store updated context
         // JTE TODO - make this thread-safe
-        conversationContext = req.body.Context;
-        console.log(req.body);
+        conversationContext = data.context;
+        console.log(data);
         console.log(conversationContext);
+
 
         responseMsg = resptext;
       }
