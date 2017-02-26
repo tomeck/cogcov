@@ -15,10 +15,17 @@ var cfenv = require('cfenv');
 // Setup Watson Conversation
 var Conversation = require('watson-developer-cloud/conversation/v1');
 
+// Get the app environment from Cloud Foundry
+var appEnv = cfenv.getAppEnv();
+
+
 // JTE TODO - get from VCAP_SERVICES?
 var conversationUsername = 'e7628040-92ad-4a01-8415-467b78ee3110';
 var conversationPassword = 'qGz4gBDXiHHi';
 var conversationWorkspace = 'ba1d1b65-2ce5-4901-8377-2de214dea244';
+
+//var vcap_services = JSON.parse(process.env.VCAP_SERVICES)
+//var uri = vcap_services.mypostgres[0].credentials.uri
 
 // Create the service wrapper
 var conversation = new Conversation({
@@ -115,9 +122,6 @@ app.post('/sms', function(req, res) {
       console.log("Wrote message back to Twilio");
   });
 });
-
-// Get the app environment from Cloud Foundry
-var appEnv = cfenv.getAppEnv();
 
 // Start server on host and port specified in CF config
 // or Express defaults when running locally
