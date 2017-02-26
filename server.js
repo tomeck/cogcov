@@ -17,20 +17,15 @@ var Conversation = require('watson-developer-cloud/conversation/v1');
 
 // Get the app environment from Cloud Foundry
 var appEnv = cfenv.getAppEnv();
-
-
-// JTE TODO - get from VCAP_SERVICES?
+// JTE TODO - read Env Vars from cfenv
+//var conversationUsername = vcap_services.conversation.credentials.username || 'e7628040-92ad-4a01-8415-467b78ee3110';
+//var conversationPassword = vcap_services.conversation.credentials.password || 'qGz4gBDXiHHi';
 var conversationUsername = 'e7628040-92ad-4a01-8415-467b78ee3110';
 var conversationPassword = 'qGz4gBDXiHHi';
 var conversationWorkspace = 'ba1d1b65-2ce5-4901-8377-2de214dea244';
 
-//var vcap_services = JSON.parse(process.env.VCAP_SERVICES)
-//var uri = vcap_services.mypostgres[0].credentials.uri
-
 // Create the service wrapper
 var conversation = new Conversation({
-  // If unspecified here, the CONVERSATION_USERNAME and CONVERSATION_PASSWORD env properties will be checked
-  // After that, the SDK will fall back to the bluemix-provided VCAP_SERVICES environment property
   username: conversationUsername,
   password: conversationPassword,
   version_date: Conversation.VERSION_DATE_2017_02_03
@@ -38,13 +33,13 @@ var conversation = new Conversation({
 // End Watson Conversation
 
 // JTE TODO - make this thread-safe and store in in-memory cache
-var conversationContext = {};
+var conversationContext = null;
 
 var app = express();
 
 // JTE NEEDED?
 // serve the files out of ./public as our main files
-app.use(express.static(__dirname + '/public'));
+//app.use(express.static(__dirname + '/public'));
 
 // parse application/json
 //app.use(bodyParser.json());
@@ -78,17 +73,6 @@ app.post('/sms', function(req, res) {
   var inBody = req.body.Body;
   console.log('Input received: ' + inBody + ' from ' + inFrom );
 
-
-  //console.log('Workspace id is: ' + conversationWorkspace);
-
-/*
-  var payload = {
-    workspace_id: conversationWorkspace,
-    context: bcontext || {},
-    input: binput || {}
-  };
-*/
-
   // JTE TODO - do I need to maintain/pass in conversation context?
   // Send the input to the conversation service
   conversation.message({
@@ -108,6 +92,7 @@ app.post('/sms', function(req, res) {
         // Store updated context
         // JTE TODO - make this thread-safe
         conversationContext = req.body.Context;
+        console.log(req.body);
         console.log(conversationContext);
 
         responseMsg = resptext;
