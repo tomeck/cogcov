@@ -1,7 +1,7 @@
 {
-  "name": "NodejsStarterApp",
+  "name": "CogCov",
   "version": "0.0.1",
-  "private": true,
+  "license": "Apache-2.0",
   "scripts": {
     "start": "node server.js"
   },
@@ -13,7 +13,20 @@
     "twilio": "^2.11.1",
     "watson-developer-cloud": "^2.21.1"
   },
-  "repository": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tomeck/cogcov.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tomeck/cogcov/issues"
+  },
+  "author": "Tom Eck",
+  "contributors": [
+    {
+      "name": "Tom Eck",
+      "email": "tom.eck@ibm.com"
+    }
+  ],
   "engines": {
     "node": "4.x"
   }

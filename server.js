@@ -1,11 +1,11 @@
-// For listening to webhook calls from Twilio
+// For running an Express server to respond to the API requests
 var http = require('http');
 var express = require('express');
 var bodyParser = require('body-parser');
 
 // For Twilio integration
 var twilio = require('twilio');
-// create a Twilio REST client
+// create a Twilio REST client - only needed if initiating SMS's
 //var client = require('./twilio-node/lib')('ACbb28e740dadc52c2575f545b1d544b83', 'd31a27296b3b9ea2f0893cc64411198b');
 
 // cfenv provides access to your Cloud Foundry environment
@@ -47,6 +47,10 @@ app.use( bodyParser.urlencoded({ extended: true }));
 
 // Use this to get the entire body in raw format
 //app.use(bodyParser.text({type: '*/*'}));
+app.get('/sms', function(req, res) {
+    res.send('Hello World');
+  }
+);
 
 app.post('/sms', function(req, res) {
   /*
@@ -112,53 +116,11 @@ app.post('/sms', function(req, res) {
   });
 });
 
-/* --- ORIG WORKING
-
-app.post('/sms', function(req, res) {
-
-  try {
-    console.log(req.headers['content-type']);
-
-    // JSON
-    //console.log( 'Received: ' + JSON.stringify(req.body, null, 2) );
-    //var responseMsg = 'Thanks for sending ' + req.body['foo'];
-
-    // TEXT
-    //console.log( 'Received: ' + req.body );
-    //var responseMsg = 'Thanks for sending ' + req.body;
-
-    // FORM-URLENCODED
-    var from = req.body.From;
-    var body = req.body.Body;
-    //var responseMsg = 'Received ' + body + ' from ' + from;
-    //var responseMsg = 'Why would you send me such a stupid text like ' + body;
-    var responseMsg = 'You suck';
-
-    var twiml = new twilio.TwimlResponse();
-    twiml.message(responseMsg);
-    res.writeHead(200, {'Content-Type': 'text/xml'});
-    res.end(twiml.toString());
-
-    console.log("Wrote message back to Twilio");
-  }
-  catch(e) {
-    console.log('ERROR: ' + e);
-  }
-});
-
-*/
-
-// JTE NEEDED?
-// get the app environment from Cloud Foundry
+// Get the app environment from Cloud Foundry
 var appEnv = cfenv.getAppEnv();
 
-/* ORIG
-http.createServer(app).listen(1337, function () {
-  console.log("Express server listening on port 1337");
-});
-*/
-
-// start server on the specified port and binding host
+// Start server on host and port specified in CF config
+// or Express defaults when running locally
 app.listen(appEnv.port, '0.0.0.0', function() {
   // print a message when the server starts listening
   console.log("server starting on " + appEnv.url);

@@ -1,6 +1,7 @@
-# Node.js Hello World Sample
+# Node.js Cognitive Conversation sample
 
-This application demonstrates a simple, reusable Node.js web application based on the Express framework.
+This application demonstrates a simple, reusable Node.js web application based on the Express framework that integrates
+with Watson Conversation and Twilio to provide an SMS chat-bot.
 
 [![Deploy to Bluemix](https://bluemix.net/deploy/button.png)](https://bluemix.net/deploy?repository=https://github.com/IBM-Bluemix/nodejs-helloworld)
 
@@ -16,8 +17,7 @@ This application demonstrates a simple, reusable Node.js web application based o
 
 ## Twilio integration
 
-Copy the URL and paste it PLUS "/SMS" into the Webhook POST handler for Messages
-for the phone number on Twilio
+Copy the URL and paste it PLUS "/SMS" into the Webhook POST handler for Messages for the phone number on Twilio
 
 Send an SMS to the Twilio number
 
