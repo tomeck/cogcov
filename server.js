@@ -75,7 +75,7 @@ app.post('/sms', function(req, res) {
   console.log('Input received: ' + inBody + ' from ' + phoneNum );
 
   // Get the Watson Conversation id associated with the source phone number
-  let ctxt = mcache.get(phoneNum) || null;
+  var ctxt = mcache.get(phoneNum) || null;
 
   if( ctxt != null ) {
     console.log('Context found for ' + phoneNum);
