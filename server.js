@@ -12,6 +12,9 @@ var twilio = require('twilio');
 // for more info, see: https://www.npmjs.com/package/cfenv
 var cfenv = require('cfenv');
 
+// For maintaining state of a Conversation
+var mcache = require('memory-cache');
+
 // Setup Watson Conversation
 var Conversation = require('watson-developer-cloud/conversation/v1');
 
@@ -32,15 +35,8 @@ var conversation = new Conversation({
 });
 // End Watson Conversation
 
-// JTE TODO - make this thread-safe and store in in-memory cache
-var conversationContext = null;
-
+// Setup the Express application instance
 var app = express();
-
-// JTE NEEDED?
-// serve the files out of ./public as our main files
-//app.use(express.static(__dirname + '/public'));
-
 // parse application/json
 //app.use(bodyParser.json());
 //app.use(bodyParser.text());
@@ -49,11 +45,14 @@ app.use( bodyParser.urlencoded({ extended: true }));
 
 // Use this to get the entire body in raw format
 //app.use(bodyParser.text({type: '*/*'}));
+
+// API call demonstrating HTTP GET action
 app.get('/sms', function(req, res) {
     res.send('Hello World');
   }
 );
 
+// Twilio will POST to the /sms resource when it receives an SMS message
 app.post('/sms', function(req, res) {
   /*
   var workspace = process.env.WORKSPACE_ID || conversationWorkspace;
@@ -66,18 +65,29 @@ app.post('/sms', function(req, res) {
   }
   */
 
-  console.log(req.headers['content-type']);
+  //console.log('Content-Type: ' + req.headers['content-type']);
 
   // FORM-URLENCODED as per Twilio POST format
-  var inFrom = req.body.From;
+  var phoneNum = req.body.From;
   var inBody = req.body.Body;
-  console.log('Input received: ' + inBody + ' from ' + inFrom );
 
-  // JTE TODO - do I need to maintain/pass in conversation context?
+  console.log('-----------------');
+  console.log('Input received: ' + inBody + ' from ' + phoneNum );
+
+  // Get the Watson Conversation id associated with the source phone number
+  let ctxt = mcache.get(phoneNum) || null;
+
+  if( ctxt != null ) {
+    console.log('Context found for ' + phoneNum);
+  }
+  else {
+    console.log('No context found for ' + phoneNum);
+  }
+
   // Send the input to the conversation service
   conversation.message({
       input: { text: inBody },
-      context : conversationContext,
+      context : ctxt,
       workspace_id: conversationWorkspace
     }, function(err, data) {
       var responseMsg;
@@ -87,7 +97,7 @@ app.post('/sms', function(req, res) {
       } else {
 
         // Extract response returned by Watson
-        var resptext = data.output.text[0];
+        responseMsg = data.output.text[0];
 
         var firstIntent = (data.intents != null && data.intents.length>0 ) ? data.intents[0] : null;
         var intentName = (firstIntent != null) ? firstIntent.intent : "";
@@ -99,18 +109,25 @@ app.post('/sms', function(req, res) {
 
         var conversationId = data.context.conversation_id;
         console.log('Detected intent {' + intentName + '} with confidence ' + intentConfidence);
-        console.log('Detected entity {' + entityName + '} with value {' + entityValue) + "}";
+        console.log('Detected entity {' + entityName + '} with value {' + entityValue + "}");
         console.log('Conversation id = ' + conversationId);
-        console.log('Response will be: ' + resptext);
-
-        // Store updated context
-        // JTE TODO - make this thread-safe
-        conversationContext = data.context;
+        console.log('Response will be: ' + responseMsg);
         console.log(data);
-        console.log(conversationContext);
+        //console.log(data.context);
 
-
-        responseMsg = resptext;
+        // JTE TODO - get Watson Conversation context working
+        // so that we key off context.action here
+        if( "place_order" == intentName && firstEntity != null ) {
+          console.log('*** ACTION: Place order for ' + entityValue );
+          mcache.del(phoneNum);
+          console.log('Context cleared for ' + phoneNum );
+        }
+        else {
+          // Store updated context if the
+          // conversation is not complete
+          mcache.put(phoneNum,data.context);
+          console.log('Context set for ' + phoneNum );
+        }
       }
 
       // Compose the response to Twilio that will be SMS'd back to originator
@@ -120,6 +137,7 @@ app.post('/sms', function(req, res) {
       res.end(twiml.toString());
 
       console.log("Wrote message back to Twilio");
+      console.log('-----------------');
   });
 });
 
